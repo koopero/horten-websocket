@@ -1,0 +1,20 @@
+{
+  "name": "horten-websocket",
+  "version": "0.0.1",
+  "description": "WebSocket adapter for Loopin",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "express": "^4.14.0",
+    "express-ws": "^2.0.0",
+    "ws": "^1.1.1"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0"
+  }
+}
