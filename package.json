@@ -1,6 +1,6 @@
 {
   "name": "horten-websocket",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "WebSocket adapter for Loopin",
   "main": "index.js",
   "scripts": {
@@ -15,6 +15,13 @@
     "ws": "^1.1.1"
   },
   "devDependencies": {
-    "chai": "^3.5.0"
+    "chai": "^3.5.0",
+    "gulp": "^3.9.1",
+    "gulp-browserify": "^0.5.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-sizereport": "^1.2.0",
+    "gulp-uglify": "^2.0.0",
+    "gulp-util": "^3.0.7",
+    "pump": "^1.0.1"
   }
 }

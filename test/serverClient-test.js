@@ -5,7 +5,7 @@ const test = require('./_test')
     , Loopin = test.Loopin
     , Promise = require('bluebird')
 
-require('../client/polyfill')
+require('../src/polyfill')
 
 describe('server + client', function () {
   it('will be created automatically for tests', function () {
@@ -14,7 +14,6 @@ describe('server + client', function () {
         , client = both.client
 
     return both.open()
-    .tap ( () => console.log('Hello?') )
     .then( both.close )
   })
 

@@ -2,8 +2,8 @@ const test = exports
 test.assert = require('chai').assert
 test.Loopin = require('loopin')
 
-const Server = require('../server/Server')
-    , Client = require('../client/Client')
+const Server = require('../src/Server')
+    , Client = require('../src/Client')
 
 const H = require('horten')
     , Mutant = H.Mutant

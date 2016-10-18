@@ -1,7 +1,7 @@
 'use strict'
 
-const NS = require('../common/namespace')
-    , Connection = require('../common/Connection')
+const NS = require('./namespace')
+    , Connection = require('./Connection')
 
 const H = require('horten')
     , Promise = require('bluebird')
@@ -24,7 +24,7 @@ class Client extends Connection {
     var promise = self[ NS.openingPromise ]
 
     promise = new Promise( function ( resolve, reject ) {
-      // console.log('open.forReal', url )
+      // // console.log('open.forReal', url )
       const connection = new WebSocket( url )
       connection.once('open', function() {
         self[ NS.setConnection ]( connection )
@@ -55,7 +55,7 @@ class Client extends Connection {
     const self = this
 
     if ( self[ NS.closingPromise ] ) {
-      console.error('bailing closingPromise')
+      // console.error('bailing closingPromise')
       return self[ NS.closingPromise ]
     }
 
@@ -65,15 +65,15 @@ class Client extends Connection {
       return Promise.resolve()
 
     return self[ NS.closingPromise ] = Promise.fromCallback( function ( cb ) {
-      console.log('client.close?')
+      // console.log('client.close?')
 
       connection.close()
-      setTimeout( cb, 20 )
+      setImmediate( cb )
     })
     .then( () => {
       self[ NS.connection ] = null
       self[ NS.closingPromise ] = null
-      console.log('client.close!')
+      // console.log('client.close!')
       self.emit('close')
     })
   }

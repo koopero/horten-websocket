@@ -2,10 +2,10 @@ const test = require('./_test')
     , assert = test.assert
     , Loopin = test.Loopin
 
-require('../client/polyfill')
+require('../src/polyfill')
 
 describe('client', function () {
-  const Client = require('../client/Client')
+  const Client = require('../src/Client')
 
   it('will try to open and fail', function () {
     const client = new Client()
@@ -24,7 +24,7 @@ describe('client', function () {
     const client = test.createClient()
     return client.close()
     .then( function () {
-      
+
     })
   })
 })

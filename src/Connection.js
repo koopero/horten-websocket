@@ -1,7 +1,7 @@
 'use strict'
 
-const NS = require('../common/namespace')
-    , Message = require('../common/Message')
+const NS = require('./namespace')
+    , Message = require('./Message')
 
 
 const H = require('horten')
@@ -20,7 +20,7 @@ class Connection extends Cursor {
 
 
     msg = JSON.stringify( msg )
-    console.log('send', msg )
+    // console.log('send', msg )
 
     this[ NS.connection ].send( msg )
   }
@@ -43,12 +43,12 @@ class Connection extends Cursor {
 
 Connection.prototype[ NS.onMessage ] = function ( msg ) {
   const self = this
-  console.log( 'onMessage', msg )
+  // console.log( 'onMessage', msg )
 
   try {
     msg = JSON.parse( msg )
   } catch ( e ) {
-    console.error('error:json')
+    // console.error('error:json')
     self.emit('error')
     close()
     return
@@ -71,7 +71,7 @@ Connection.prototype[ NS.onMessage ] = function ( msg ) {
         var path = H.path.split( msg.path )
           , data = msg.data
 
-        console.log( 'deltaRemote', data, path, self )
+        // console.log( 'deltaRemote', data, path, self )
         self.patch( data, path )
         self.emit( 'deltaRemote', data, path )
       break
@@ -88,14 +88,14 @@ Connection.prototype[ NS.onClose ] = function ( mesg ) {
 }
 
 Connection.prototype[ NS.onDelta ] = function ( delta ) {
-  console.log('onDelta', delta )
+  // console.log('onDelta', delta )
   const mesg = Message.delta( delta, [] )
   this.send( mesg )
 }
 
 
 Connection.prototype[ NS.setConnection ] = function ( connection ) {
-  // console.log('setConnection', this )
+  // // console.log('setConnection', this )
   this[ NS.connection ] = connection
 
   connection.on('message', this[ NS.onMessage ].bind( this ) )

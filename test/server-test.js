@@ -3,7 +3,7 @@ const test = require('./_test')
     , Loopin = test.Loopin
 
 describe('server', function () {
-  const Server = require('../server/Server')
+  const Server = require('../src/Server')
 
   it('will open and close', function () {
     const server = new Server()

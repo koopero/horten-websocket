@@ -1,6 +1,6 @@
 'use strict'
 
-const NS = require('../common/namespace')
+const NS = require('./namespace')
 
 const _server = Symbol('_server')
     , _closingPromise = Symbol('_closingPromise')
@@ -11,7 +11,7 @@ const H = require('horten')
     , Promise = require('bluebird')
     , Cursor = H.Cursor
 
-const Connection = require('../common/Connection')
+const Connection = require('./Connection')
 
 class Server extends Cursor {
   constructor () {
@@ -20,7 +20,7 @@ class Server extends Cursor {
   }
 
   listen( port ) {
-    // console.log('listen')
+    // // console.log('listen')
     port = Math.max( parseInt( port ) || 0, 0 ) || DEFAULT_PORT
 
     const self = this
@@ -49,7 +49,7 @@ class Server extends Cursor {
 
     return self[ _closingPromise ] = Promise.fromCallback( function ( cb ) {
       server.close()
-      setTimeout( cb, 100 )
+      setImmediate( cb )
     })
     .then( () => {
       self[ _server ] = null
@@ -78,11 +78,11 @@ class Server extends Cursor {
 }
 
 Server.prototype[ NS.createConnection ] = function ( ws, req ) {
-  console.log( 'createConnection?' )
+  // console.log( 'createConnection?' )
   try {
     const connection = new Connection()
     connection._id = Math.random()
-    
+
     connection[ NS.setConnection ]( ws )
     connection.mutant = this.mutant
     connection.listening = true
@@ -92,13 +92,13 @@ Server.prototype[ NS.createConnection ] = function ( ws, req ) {
 
     this[ NS.connections ].push( connection )
   } catch ( e ) {
-    console.error( e )
+    // console.error( e )
   }
-  console.log( 'createConnection!' )
+  // console.log( 'createConnection!' )
 }
 
 Server.prototype[ NS.onClientEvent ] = function ( name ) {
-  console.log('onClientEvent', name )
+  // console.log('onClientEvent', name )
   this.emit.apply( this, arguments )
 }
 
@@ -107,7 +107,7 @@ Server.prototype[ NS.onClientMessage ] = function ( mesg, connection ) {
 }
 
 Server.prototype[ NS.onClientClose ] = function ( connection ) {
-  // console.log('closeConnection?')
+  // // console.log('closeConnection?')
   // const connection = new Connection()
   // connection.setReq( req )
   // connection.setWS( ws )
