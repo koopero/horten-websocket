@@ -1,0 +1,17 @@
+#!/bin/sh
+':' //; exec "$(command -v nodejs || command -v node)" "$0" "$@"
+
+const NS = require('../src/namespace')
+    , Server = require('../src/Server')
+    , Logger = require('../src/Logger')
+    , server = new Server()
+    , logger = new Logger()
+
+server[NS.verbose] = true
+
+logger.target = server
+
+server.mutant.patch( require('../test/_test').data() )
+
+
+server.listen( 40000 )

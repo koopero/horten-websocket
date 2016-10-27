@@ -1,0 +1,16 @@
+<html>
+<head>
+  <script src='/horten-websocket/bootstrap.js'></script>
+  <script>
+    const client = new HortenWebsocketClient()
+    client.open()
+    .then( function () {
+      client.mutant.patch('bar','foo')
+    })
+
+  </script>
+</head>
+<body>
+
+</body>
+</html>

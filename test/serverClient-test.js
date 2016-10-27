@@ -89,10 +89,6 @@ describe('server + client', function () {
     .then( ( result ) => assert.deepEqual( result, data ) )
     .then( () => assert.deepEqual( server.get(), data ) )
     .then( both.close )
-    .catch( ( e ) => {
-      both.close()
-      throw e
-    } )
   })
 
   it('server will patch client', function () {
@@ -107,6 +103,34 @@ describe('server + client', function () {
     .then( ( result ) => assert.deepEqual( result, data ) )
     .then( () => assert.deepEqual( client.get(), data ) )
     // .delay( 1000 )
+    .then( both.close )
+  })
+
+  it('server will not echo', function () {
+    const both = test.createClientServer()
+        , server = both.server
+        , client = both.client
+        , data = { foo: 'baz' }
+
+    return both.open()
+    .then( () => client.mutant.patch( data ) )
+    .then( () => test.shouldNotFire( 'send', server  ) )
+    .then( both.close )
+    .catch( ( e ) => {
+      both.close()
+      throw e
+    } )
+  })
+
+  it('client will not echo', function () {
+    const both = test.createClientServer()
+        , server = both.server
+        , client = both.client
+        , data = { foo: 'baz' }
+
+    return both.open()
+    .then( () => server.mutant.patch( data ) )
+    .then( () => test.shouldNotFire( 'message', server  ) )
     .then( both.close )
     .catch( ( e ) => {
       both.close()

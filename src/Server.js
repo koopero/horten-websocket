@@ -12,6 +12,7 @@ const H = require('horten')
     , Cursor = H.Cursor
 
 const Connection = require('./Connection')
+    , Logger = require('./Logger')
 
 class Server extends Cursor {
   constructor () {
@@ -24,7 +25,7 @@ class Server extends Cursor {
     port = Math.max( parseInt( port ) || 0, 0 ) || DEFAULT_PORT
 
     const self = this
-        , middleWare = self.middleWare
+        , middleWare = self.middleWare()
 
     return self.close()
     .then( () => Promise.fromCallback( function ( cb ) {
@@ -32,8 +33,8 @@ class Server extends Cursor {
         self[ _server ].close()
 
       self[ _server ] = middleWare.listen( port, cb )
-      self.emit('listen', { port: port } )
     }))
+    .then( () => self.emit('listen', { port: port } ) )
   }
 
   close( ) {
@@ -58,47 +59,53 @@ class Server extends Cursor {
     })
   }
 
-  get middleWare() {
-    const self = this
-        , express = require('express')
-        , app = express()
-        , ws = require('express-ws')( app )
-
-    app.ws('/', ( ws, req ) => self[ NS.createConnection ]( ws, req ) )
-
-    return app
+  middleWare() {
+    return require('./middleWare')( this )
   }
 
   send( mesg ) {
-    const self = this
+    this.emit('send', mesg )
+
     this[ NS.connections ].forEach( function ( connection ) {
-      connection.send( mesg )
+      if ( connection.isOpen() )
+        connection.send( mesg )
     })
   }
 }
 
 Server.prototype[ NS.createConnection ] = function ( ws, req ) {
-  // console.log( 'createConnection?' )
-  try {
-    const connection = new Connection()
-    connection._id = Math.random()
 
-    connection[ NS.setConnection ]( ws )
-    connection.mutant = this.mutant
-    connection.listening = true
-    connection.on('message', this[ NS.onClientEvent ].bind( this, 'message' ) )
-    connection.on('deltaRemote', this[ NS.onClientEvent ].bind( this, 'deltaRemote' ) )
-    connection.on('close', this[ NS.onClientClose ].bind( this ) )
+  const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
 
-    this[ NS.connections ].push( connection )
-  } catch ( e ) {
-    // console.error( e )
+  const id = this[ NS.connections ]
+  .filter( ( connection ) => connection.ip == ip ).length
+
+  const connection = new Connection()
+  connection._id = Math.random()
+  connection[ NS.setConnection ]( ws )
+  connection.mutant = this.mutant
+  connection.listening = true
+  connection.ip = ip
+  if ( this[ NS.verbose ] ) {
+    const logger = new Logger()
+    logger.target = connection
   }
-  // console.log( 'createConnection!' )
+
+
+  connection.on('message', this[ NS.onClientEvent ].bind( this,  'message' ) )
+  connection.on('deltaRemote', this[ NS.onClientEvent ].bind( this, 'deltaRemote' ) )
+  connection.on('close', this[ NS.onClientClose ].bind( this, connection ) )
+  connection.on('error', this[ NS.onClientError ].bind( this, connection ) )
+
+
+  connection.name = `${ip}:${id}`
+
+  this[ NS.connections ].push( connection )
+
+  connection.emit('open')
 }
 
 Server.prototype[ NS.onClientEvent ] = function ( name ) {
-  // console.log('onClientEvent', name )
   this.emit.apply( this, arguments )
 }
 
@@ -107,11 +114,16 @@ Server.prototype[ NS.onClientMessage ] = function ( mesg, connection ) {
 }
 
 Server.prototype[ NS.onClientClose ] = function ( connection ) {
-  // // console.log('closeConnection?')
-  // const connection = new Connection()
-  // connection.setReq( req )
-  // connection.setWS( ws )
-  // this[ NS.connections ].push( connection )
+  connection.removeAllListeners()
+
+  var ind
+  while ( ( ind = this[ NS.connections ].indexOf( connection ) ) != -1 )
+    this[ NS.connections ].splice( ind, 1 )
 }
+
+Server.prototype[ NS.onClientError ] = function ( connection ) {
+  console.log('Server.connection.error')
+}
+
 
 module.exports = Server

@@ -9,11 +9,26 @@ const H = require('horten')
 class Client extends Connection {
 
   open ( url ) {
-    url = url || 0
-
     if ( 'number' == typeof url  ) {
-      url = url || 4000
-      url = 'ws://localhost:'+url
+      url = Math.max( 0, parseInt( url ) ) || NS.DEFAULT_PORT
+      url = 'ws://localhost:'+url+'/horten-websocket'
+    }
+
+    if ( !url ) {
+      const window = global.window
+
+      if ( window ) {
+        var loc = window.location
+
+        if (loc.protocol === "https:") {
+            url = "wss:";
+        } else {
+            url = "ws:";
+        }
+
+        url += "//" + loc.host;
+        url += '/horten-websocket';
+      }
     }
 
     const self = this
@@ -23,18 +38,29 @@ class Client extends Connection {
 
     var promise = self[ NS.openingPromise ]
 
+
     promise = new Promise( function ( resolve, reject ) {
-      // // console.log('open.forReal', url )
       const connection = new WebSocket( url )
-      connection.once('open', function() {
+
+      if ( 'function' == typeof connection.once ) {
+        // Is ws
+        connection.once('open', onOpen )
+        connection.once('error', onError )
+      } else {
+        // Is real, native WebSocket
+        connection.onopen = onOpen
+        connection.onerror = onError
+      }
+
+      function onOpen() {
         self[ NS.setConnection ]( connection )
         resolve( self )
-      } )
+      }
 
-      connection.once('error', function ( err ) {
+      function onError( err ) {
         connection.removeAllListeners()
         reject( err )
-      })
+      }
     })
 
     if ( opt.pull )
@@ -44,41 +70,20 @@ class Client extends Connection {
 
     promise = promise.then( function () {
       self[ NS.openingPromise] = null
+      self.emit('open')
+
     })
 
     self[ NS.openingPromise ] = promise
 
     return promise
   }
-
-  close( ) {
-    const self = this
-
-    if ( self[ NS.closingPromise ] ) {
-      // console.error('bailing closingPromise')
-      return self[ NS.closingPromise ]
-    }
-
-    const connection = self[ NS.connection ]
-
-    if ( !connection )
-      return Promise.resolve()
-
-    return self[ NS.closingPromise ] = Promise.fromCallback( function ( cb ) {
-      // console.log('client.close?')
-
-      connection.close()
-      setImmediate( cb )
-    })
-    .then( () => {
-      self[ NS.connection ] = null
-      self[ NS.closingPromise ] = null
-      // console.log('client.close!')
-      self.emit('close')
-    })
-  }
 }
 
+
+Client.prototype[ NS.onWebSocketMessage ] = function ( message ) {
+  this[ NS.onMessage ]( message.data )
+}
 
 // Client.prototype[ NS.onConnectionOpen ] = function onConnectionOpen() {
 //   this.emit('open')

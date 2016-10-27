@@ -6,6 +6,7 @@ const NS = require('./namespace')
 
 const H = require('horten')
     , Cursor = H.Cursor
+    , Promise = require('bluebird')
 
 class Connection extends Cursor {
   constructor() {
@@ -18,10 +19,9 @@ class Connection extends Cursor {
     if ( !this[ NS.connection ] )
       throw new Error('Cannot send with no connection')
 
-
+    this.emit('send', msg )
     msg = JSON.stringify( msg )
-    // console.log('send', msg )
-
+    // console.log('Connection.send', this[ NS.connection ].readyState )
     this[ NS.connection ].send( msg )
   }
 
@@ -39,6 +39,59 @@ class Connection extends Cursor {
       })
     })
   }
+
+  close( ) {
+    const self = this
+
+    if ( self[ NS.closingPromise ] ) {
+      // console.error('bailing closingPromise')
+      return self[ NS.closingPromise ]
+    }
+
+    const connection = self[ NS.connection ]
+
+    if ( !connection )
+      return Promise.resolve()
+
+    const promise = self[ NS.closingPromise ] = Promise.fromCallback( function ( cb ) {
+      // console.log('client.close?')
+
+      connection.close()
+      setImmediate( cb )
+    })
+    .catch( function ( closeError ) {
+      // Probably don't care...
+      console.error('Connection.close', closeError )
+    })
+    .then( () => {
+      self[ NS.connection ] = null
+      self[ NS.closingPromise ] = null
+      // console.log('client.close!')
+      self.emit('close')
+    })
+
+    return promise
+  }
+
+  isOpen() {
+    if ( this[ NS.closingPromise ] )
+      return false
+
+    if ( this[ NS.connection ] ) {
+      const readyState = this[ NS.connection ].readyState
+      switch ( readyState ) {
+        case 0:
+          return false
+
+        case 1:
+          return true
+
+        default:
+          this.close()
+          return false
+      }
+    }
+  }
 }
 
 Connection.prototype[ NS.onMessage ] = function ( msg ) {
@@ -50,7 +103,7 @@ Connection.prototype[ NS.onMessage ] = function ( msg ) {
   } catch ( e ) {
     // console.error('error:json')
     self.emit('error')
-    close()
+    self.close()
     return
   }
 
@@ -80,17 +133,18 @@ Connection.prototype[ NS.onMessage ] = function ( msg ) {
 }
 
 Connection.prototype[ NS.onError ] = function ( mesg ) {
-
+  console.error( 'Connection.prototype.onError', mesg )
 }
 
 Connection.prototype[ NS.onClose ] = function ( mesg ) {
-
+  // console.error( 'Connection.prototype.onClose', mesg )
 }
 
 Connection.prototype[ NS.onDelta ] = function ( delta ) {
   // console.log('onDelta', delta )
   const mesg = Message.delta( delta, [] )
-  this.send( mesg )
+  if ( this.isOpen() )
+    this.send( mesg )
 }
 
 
@@ -98,9 +152,20 @@ Connection.prototype[ NS.setConnection ] = function ( connection ) {
   // // console.log('setConnection', this )
   this[ NS.connection ] = connection
 
-  connection.on('message', this[ NS.onMessage ].bind( this ) )
-  connection.on('error',   this[ NS.onError ]  .bind( this ) )
-  connection.on('close',   this[ NS.onClose ]  .bind( this ) )
+
+  if ( 'function' == typeof connection.on ) {
+    // Is ws
+    connection.on('message', this[ NS.onMessage ].bind( this ) )
+    connection.on('error',   this[ NS.onError ]  .bind( this ) )
+    connection.on('close',   this[ NS.onClose ]  .bind( this ) )
+  } else {
+    // Is real, native WebSocket
+    connection.onmessage = this[ NS.onWebSocketMessage ].bind( this )
+    connection.onerror   = this[ NS.onError ]  .bind( this )
+    connection.onclose   = this[ NS.onClose ]  .bind( this )
+  }
+
+
 }
 
 module.exports = Connection
