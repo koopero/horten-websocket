@@ -71,7 +71,7 @@ class Client extends Connection {
     promise = promise.then( function () {
       self[ NS.openingPromise] = null
       self.emit('open')
-
+      self.listening = true
     })
 
     self[ NS.openingPromise ] = promise

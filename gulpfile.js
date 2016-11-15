@@ -57,7 +57,7 @@ const createBundle = options => {
     .pipe(buffer())
     .pipe($.sourcemaps.init({ loadMaps: true }))
     // .pipe($.uglify())
-    .pipe($.sourcemaps.write('../maps'))
+    .pipe($.sourcemaps.write('.'))
     .pipe(gulp.dest(options.destination))
 
   if (isWatchify) {

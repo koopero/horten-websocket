@@ -11,8 +11,14 @@ const H = require('horten')
 class Connection extends Cursor {
   constructor() {
     super()
-    this.on('delta', this[ NS.onDelta ].bind( this ) )
-    this.listening = true
+
+    this.configure({
+      delay: 1,
+      onDelta: this[ NS.onDelta ].bind( this )
+    })
+
+    this[ NS.tick ] = this[ NS.tick ].bind( this )
+
   }
 
   send( msg ) {
@@ -23,6 +29,7 @@ class Connection extends Cursor {
     msg = JSON.stringify( msg )
     // console.log('Connection.send', this[ NS.connection ].readyState )
     this[ NS.connection ].send( msg )
+    this[ NS.tick ]()
   }
 
   pull() {
@@ -91,6 +98,32 @@ class Connection extends Cursor {
           return false
       }
     }
+  }
+}
+
+Connection.prototype[ NS.tick ] = function () {
+  const self = this
+      , isOpen = self.isOpen
+
+  if ( isOpen ) {
+    const connection = this[ NS.connection ]
+        , bufferedAmount = connection.bufferedAmount
+
+    var next
+
+    if ( bufferedAmount ) {
+      self.hold = true
+      next = true
+    } else {
+      self.hold = false
+    }
+  } else {
+    // not open
+    self.hold = true
+  }
+
+  if ( next ) {
+    setImmediate( self[ NS.tick ] )
   }
 }
 

@@ -28,3 +28,6 @@ NS.onWebSocketMessage = Symbol()
 NS.onMessage = Symbol()
 NS.onError = Symbol()
 NS.onClose = Symbol()
+NS.middleWare = Symbol()
+
+NS.tick = Symbol()

@@ -60,7 +60,8 @@ class Server extends Cursor {
   }
 
   middleWare() {
-    return require('./middleWare')( this )
+    this[ NS.middleWare ] = this[ NS.middleWare ] || require('./middleWare')( this )
+    return this[ NS.middleWare ]
   }
 
   send( mesg ) {
