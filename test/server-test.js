@@ -1,6 +1,5 @@
 const test = require('./_test')
     , assert = test.assert
-    , Loopin = test.Loopin
 
 describe('server', function () {
   const Server = require('../src/Server')

@@ -1,6 +1,5 @@
 const test = require('./_test')
     , assert = test.assert
-    , Loopin = test.Loopin
 
 require('../src/polyfill')
 

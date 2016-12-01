@@ -1,6 +1,5 @@
 const test = exports
 test.assert = require('chai').assert
-test.Loopin = require('loopin')
 
 var ID = 0
 const nextId = () => ID++
@@ -92,5 +91,5 @@ test.data = function() {
     result[key] = Math.round( Math.random() * 12 ) * Math.pow( 2, Math.round( Math.random() * 4 - 2 ) )
   }
 
-  return result 
+  return result
 }

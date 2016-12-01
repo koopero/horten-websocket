@@ -2,7 +2,6 @@
 
 const test = require('./_test')
     , assert = test.assert
-    , Loopin = test.Loopin
     , Promise = require('bluebird')
 
 require('../src/polyfill')
