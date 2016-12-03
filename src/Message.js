@@ -1,4 +1,7 @@
-const Message = module.exports
+'use strict'
+
+
+var Message = module.exports
 
 Message.pull = function ( path ) {
   return {
@@ -17,7 +20,7 @@ Message.delta = function ( delta ) {
 
 
 
-// const H = require('horten')
+// var H = require('horten')
 //
 // Message.parse = function ( msg ) {
 //   try {
@@ -36,7 +39,7 @@ Message.delta = function ( delta ) {
 // }
 //
 // function Message ( type, data, path__) {
-//   const path = H.path.slice( arguments, 2 )
+//   var path = H.path.slice( arguments, 2 )
 //
 //   return {
 //     type: type,

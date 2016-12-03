@@ -1,10 +1,10 @@
 'use strict'
 
-const NS = require('./namespace')
+var NS = require('./namespace')
     , Message = require('./Message')
 
 
-const H = require('horten')
+var H = require('horten')
     , Cursor = H.Cursor
     , Promise = require('bluebird')
 
@@ -27,13 +27,12 @@ class Connection extends Cursor {
 
     this.emit('send', msg )
     msg = JSON.stringify( msg )
-    // console.log('Connection.send', this[ NS.connection ].readyState )
     this[ NS.connection ].send( msg )
     this[ NS.tick ]()
   }
 
   pull() {
-    const self = this
+    var self = this
         , path = H.path.split( arguments )
         , message = Message.pull( path )
 
@@ -48,19 +47,19 @@ class Connection extends Cursor {
   }
 
   close( ) {
-    const self = this
+    var self = this
 
     if ( self[ NS.closingPromise ] ) {
       // console.error('bailing closingPromise')
       return self[ NS.closingPromise ]
     }
 
-    const connection = self[ NS.connection ]
+    var connection = self[ NS.connection ]
 
     if ( !connection )
       return Promise.resolve()
 
-    const promise = self[ NS.closingPromise ] = Promise.fromCallback( function ( cb ) {
+    var promise = self[ NS.closingPromise ] = Promise.fromCallback( function ( cb ) {
       // console.log('client.close?')
 
       connection.close()
@@ -85,7 +84,7 @@ class Connection extends Cursor {
       return false
 
     if ( this[ NS.connection ] ) {
-      const readyState = this[ NS.connection ].readyState
+      var readyState = this[ NS.connection ].readyState
       switch ( readyState ) {
         case 0:
           return false
@@ -102,23 +101,29 @@ class Connection extends Cursor {
 }
 
 Connection.prototype[ NS.tick ] = function () {
-  const self = this
-      , isOpen = self.isOpen
+  var self = this
+      , isOpen = self.isOpen()
+
+  var next
 
   if ( isOpen ) {
-    const connection = this[ NS.connection ]
+    var connection = this[ NS.connection ]
         , bufferedAmount = connection.bufferedAmount
 
-    var next
+
+    // console.log('Connection.tick', connection.bufferedAmount )
+
 
     if ( bufferedAmount ) {
       self.hold = true
       next = true
     } else {
       self.hold = false
+      self.release()
     }
   } else {
     // not open
+    console.error('CONNECTION NOT OPEN', this)
     self.hold = true
   }
 
@@ -128,7 +133,7 @@ Connection.prototype[ NS.tick ] = function () {
 }
 
 Connection.prototype[ NS.onMessage ] = function ( msg ) {
-  const self = this
+  var self = this
   // console.log( 'onMessage', msg )
 
   try {
@@ -174,8 +179,8 @@ Connection.prototype[ NS.onClose ] = function ( mesg ) {
 }
 
 Connection.prototype[ NS.onDelta ] = function ( delta ) {
-  // console.log('onDelta', delta )
-  const mesg = Message.delta( delta, [] )
+  // console.log('Connection.onDelta', delta )
+  var mesg = Message.delta( delta, [] )
   if ( this.isOpen() )
     this.send( mesg )
 }
@@ -197,6 +202,8 @@ Connection.prototype[ NS.setConnection ] = function ( connection ) {
     connection.onerror   = this[ NS.onError ]  .bind( this )
     connection.onclose   = this[ NS.onClose ]  .bind( this )
   }
+
+  this.hold = false
 
 
 }

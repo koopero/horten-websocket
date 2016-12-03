@@ -1,4 +1,6 @@
-const EVENTS = [
+'use strict'
+
+var EVENTS = [
   'listen',
   'open',
   'close',
@@ -6,14 +8,14 @@ const EVENTS = [
   'send'
 ]
 
-const NS = require('./namespace')
+var NS = require('./namespace')
 
-const treebird = require('treebird')
+var treebird = require('treebird')
 
 class Logger {
 
   event( eventName ) {
-    const data = arguments.length == 2 ?
+    var data = arguments.length == 2 ?
             arguments[1]
             : arguments.length > 2 ?
             Array.prototype.slice.call( arguments, 1 )
@@ -24,7 +26,7 @@ class Logger {
   }
 
   set target( newTarget ) {
-    const self = this
+    var self = this
 
     var target = self[NS.target]
       , listeners = self[NS.listeners]

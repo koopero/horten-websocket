@@ -1,10 +1,12 @@
-const pathlib = require('path')
+'use strict'
+
+var pathlib = require('path')
     , resolveModule = pathlib.resolve.bind( pathlib, __dirname, '..' )
 
-const NS = require('./namespace')
+var NS = require('./namespace')
 
 module.exports = function middleWare ( server ) {
-  const express = require('express')
+  var express = require('express')
       , app = express()
       , ws = require('express-ws')( app )
 

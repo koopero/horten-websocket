@@ -2,7 +2,7 @@
 <head>
   <script src='/horten-websocket/bootstrap.js'></script>
   <script>
-    const client = new HortenWebsocketClient()
+    var client = new HortenWebsocketClient()
     client.open()
     .then( function () {
       client.mutant.patch('bar','foo')

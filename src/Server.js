@@ -1,17 +1,17 @@
 'use strict'
 
-const NS = require('./namespace')
+var NS = require('./namespace')
 
-const _server = Symbol('_server')
+var _server = Symbol('_server')
     , _closingPromise = Symbol('_closingPromise')
 
-const DEFAULT_PORT = 4000
+var DEFAULT_PORT = 4000
 
-const H = require('horten')
+var H = require('horten')
     , Promise = require('bluebird')
     , Cursor = H.Cursor
 
-const Connection = require('./Connection')
+var Connection = require('./Connection')
     , Logger = require('./Logger')
 
 class Server extends Cursor {
@@ -24,7 +24,7 @@ class Server extends Cursor {
     // // console.log('listen')
     port = Math.max( parseInt( port ) || 0, 0 ) || DEFAULT_PORT
 
-    const self = this
+    var self = this
         , middleWare = self.middleWare()
 
     return self.close()
@@ -38,12 +38,12 @@ class Server extends Cursor {
   }
 
   close( ) {
-    const self = this
+    var self = this
 
     if ( self[ _closingPromise ] )
       return self[ _closingPromise ]
 
-    const server = self[ _server ]
+    var server = self[ _server ]
 
     if ( !server )
       return Promise.resolve()
@@ -76,19 +76,19 @@ class Server extends Cursor {
 
 Server.prototype[ NS.createConnection ] = function ( ws, req ) {
 
-  const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
+  var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
 
-  const id = this[ NS.connections ]
+  var id = this[ NS.connections ]
   .filter( ( connection ) => connection.ip == ip ).length
 
-  const connection = new Connection()
+  var connection = new Connection()
   connection._id = Math.random()
   connection[ NS.setConnection ]( ws )
   connection.mutant = this.mutant
   connection.listening = true
   connection.ip = ip
   if ( this[ NS.verbose ] ) {
-    const logger = new Logger()
+    var logger = new Logger()
     logger.target = connection
   }
 

@@ -1,4 +1,6 @@
-const Client = require('../src/Client')
+'use strict'
+
+var Client = require('../src/Client')
 
 global.HortenWebsocketClient = global.HortenWebsocketClient || Client
 

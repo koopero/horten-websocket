@@ -1,13 +1,13 @@
-const test = require('./_test')
+var test = require('./_test')
     , assert = test.assert
 
 describe('server', function () {
-  const Server = require('../src/Server')
+  var Server = require('../src/Server')
 
   it('will open and close', function () {
-    const server = new Server()
+    var server = new Server()
 
-    const listenPromise = server.listen( 4000 )
+    var listenPromise = server.listen( 4000 )
     assert.isFunction ( listenPromise.then )
 
     return listenPromise
@@ -15,7 +15,7 @@ describe('server', function () {
   })
 
   it('will be created automatically for tests', function () {
-    const server = test.createServer()
+    var server = test.createServer()
     return server.listen( 50000 )
     .then( () => server.close() )
   })

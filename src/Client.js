@@ -1,9 +1,9 @@
 'use strict'
 
-const NS = require('./namespace')
+var NS = require('./namespace')
     , Connection = require('./Connection')
 
-const H = require('horten')
+var H = require('horten')
     , Promise = require('bluebird')
 
 class Client extends Connection {
@@ -15,7 +15,7 @@ class Client extends Connection {
     }
 
     if ( !url ) {
-      const window = global.window
+      var window = global.window
 
       if ( window ) {
         var loc = window.location
@@ -31,7 +31,7 @@ class Client extends Connection {
       }
     }
 
-    const self = this
+    var self = this
         , opt = {}
 
     self._id = '_client'
@@ -40,7 +40,7 @@ class Client extends Connection {
 
 
     promise = new Promise( function ( resolve, reject ) {
-      const connection = new WebSocket( url )
+      var connection = new WebSocket( url )
 
       if ( 'function' == typeof connection.once ) {
         // Is ws

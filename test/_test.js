@@ -1,28 +1,28 @@
-const test = exports
+var test = exports
 test.assert = require('chai').assert
 
 var ID = 0
-const nextId = () => ID++
+var nextId = () => ID++
 
-const NS = require('../src/namespace')
+var NS = require('../src/namespace')
     , Server = require('../src/Server')
     , Logger = require('../src/Logger')
     , Client = require('../src/Client')
 
 
-const H = require('horten')
+var H = require('horten')
     , Mutant = H.Mutant
 
-const Promise = require('bluebird')
+var Promise = require('bluebird')
 
-const PORT = 4000
+var PORT = 4000
 
 test.port = ( override ) => Math.max( 0, parseInt( override ) ) || PORT
 
 test.createClientServer = function () {
-  const port = PORT
+  var port = PORT
 
-  const client = test.createClient( port )
+  var client = test.createClient( port )
       , server = test.createServer( port )
 
   return {
@@ -35,10 +35,10 @@ test.createClientServer = function () {
 
 test.createClient = function ( port ) {
   port = test.port( port )
-  const url = 'ws://localhost:'+port
-  const opt = { pull: false }
-  const client = new Client()
-  const logger = new Logger()
+  var url = 'ws://localhost:'+port
+  var opt = { pull: false }
+  var client = new Client()
+  var logger = new Logger()
   logger.target = client
   client.name = 'client:'+nextId()
 
@@ -50,8 +50,8 @@ test.createClient = function ( port ) {
 
 test.createServer = function ( port ) {
   port = test.port( port )
-  const server = new Server()
-  const logger = new Logger()
+  var server = new Server()
+  var logger = new Logger()
   logger.target = server
   server.name = 'server:'+nextId()
   server.mutant = new Mutant()
@@ -80,10 +80,10 @@ test.ping = function( port ) {
 }
 
 
-const DATA_KEYS = ['sparky','skookum','saddlebag','sarcasm','such']
+var DATA_KEYS = ['sparky','skookum','saddlebag','sarcasm','such']
 
 test.data = function() {
-  const result = {}
+  var result = {}
   for ( var i = 0; i < 3; i ++ ) {
     var ind = Math.floor( DATA_KEYS.length * Math.random() )
       , key = DATA_KEYS[ind]

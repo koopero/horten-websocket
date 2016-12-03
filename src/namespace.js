@@ -1,4 +1,6 @@
-const NS = exports
+'use strict'
+
+var NS = exports
 
 NS.DEFAULT_PORT = 4000
 

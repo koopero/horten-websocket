@@ -1,6 +1,6 @@
 'use strict'
 
-const _ = require('lodash')
+var _ = require('lodash')
     , gulp = require( 'gulp' )
     , gulpLoadPlugins = require( 'gulp-load-plugins' )
     , browserify = require( 'browserify' )
@@ -12,8 +12,8 @@ const _ = require('lodash')
     , assign = _.assign
 
 let isWatchify = false
-const $ = gulpLoadPlugins()
-const bundles = [
+var $ = gulpLoadPlugins()
+var bundles = [
   {
     entries: ['./bundle/bootstrap.js'],
     output: 'bootstrap.js',
@@ -36,20 +36,27 @@ gulp.task('clean', function () {
 
 // browserify with babelify the JS code, and watchify
 
-const createBundle = options => {
-  const opts = assign({}, watchify.args, {
+var createBundle = options => {
+  var opts = assign({}, watchify.args, {
     entries: options.entries,
     extensions: options.extensions,
     debug: true
   })
 
   let b = browserify(opts)
-  b.transform(babelify.configure({
-    // presets: ["es2015"],
-    compact: false
-  }))
+  // b.transform(babelify.configure({
+  //   // plugins: ["transform-es2015-classes"],
+  //   presets: ['es2015'],
+  //   compact: false
+  // }))
 
-  const rebundle = () =>
+  b.transform(babelify, {
+    global: true,
+    ignore: /\/node_modules\/(?!horten\/)/,
+    presets: ['es2015']
+  })
+
+  var rebundle = () =>
     b.bundle()
     // log errors if they happen
     .on('error', $.util.log.bind($.util, 'Browserify Error'))
