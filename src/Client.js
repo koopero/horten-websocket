@@ -4,7 +4,6 @@ const NS = require('./namespace')
     , Connection = require('./Connection')
 
 const H = require('horten')
-    , Promise = require('bluebird')
 
 class Client extends Connection {
   constructor( opt ) {
