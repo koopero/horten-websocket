@@ -1,7 +1,7 @@
 #!/bin/sh
 ':' //; exec "$(command -v nodejs || command -v node)" "$0" "$@"
 
-var NS = require('../src/namespace')
+const NS = require('../src/namespace')
     , Server = require('../src/Server')
     , Logger = require('../src/Logger')
     , server = new Server()
