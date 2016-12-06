@@ -1,6 +1,6 @@
 'use strict'
 
-var _ = require('lodash')
+const _ = require('lodash')
     , gulp = require( 'gulp' )
     , gulpLoadPlugins = require( 'gulp-load-plugins' )
     , browserify = require( 'browserify' )
@@ -17,8 +17,10 @@ var bundles = [
   {
     entries: ['./bundle/bootstrap.js'],
     output: 'bootstrap.js',
-    extensions: ['.js'],
-    destination: './build/'
+  },
+  {
+    entries: ['./bundle/HortenWebsocketClient.js'],
+    output: 'HortenWebsocketClient.js',
   }
 ]
 
@@ -39,7 +41,7 @@ gulp.task('clean', function () {
 var createBundle = options => {
   var opts = assign({}, watchify.args, {
     entries: options.entries,
-    extensions: options.extensions,
+    extensions: ['.js'],
     debug: true
   })
 
@@ -51,8 +53,8 @@ var createBundle = options => {
   // }))
 
   b.transform(babelify, {
-    // global: true,
-    // ignore: /\/node_modules\/(?!horten\/)/,
+    global: true,
+    ignore: /\/node_modules\/(?!horten\/)/,
     presets: ['es2015']
   })
 
@@ -63,9 +65,9 @@ var createBundle = options => {
     .pipe(source(options.output))
     .pipe(buffer())
     .pipe($.sourcemaps.init({ loadMaps: true }))
-    // .pipe($.uglify())
+    .pipe($.size({ showFiles: true }))
     .pipe($.sourcemaps.write('.'))
-    .pipe(gulp.dest(options.destination))
+    .pipe(gulp.dest('./build/'))
 
   if (isWatchify) {
     b = watchify(b)
@@ -76,28 +78,29 @@ var createBundle = options => {
   return rebundle()
 }
 
-gulp.task('scripts', () =>
-  bundles.forEach( bundle =>
+gulp.task('scripts', ['clean'], () =>
+  $.all( bundles.map( bundle =>
     createBundle( bundle )
-  )
+  ) )
 )
-
-/**
- * Watch files for changes with watchify
- */
-
-gulp.task('sizereport', function () {
-  return gulp.src('dist/*')
-  .pipe( $.sizereport() )
-})
-
 
 gulp.task('watch', () => {
   isWatchify = true
   runSequence(['scripts'])
 })
 
+gulp.task('default', ['clean','scripts','compress'] )
 
-gulp.task('default', () => {
-  runSequence(['clean','scripts'])
+gulp.task('compress', ['scripts'], function (cb) {
+  require('pump')([
+        gulp.src('build/*.js'),
+        $.uglify(),
+        $.rename({
+          extname: '.min.js'
+        }),
+        $.size({ showFiles: true }),
+        gulp.dest('build')
+    ],
+    cb
+  )
 })
