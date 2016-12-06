@@ -1,6 +1,6 @@
 {
   "name": "horten-websocket",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "WebSocket adapter for Horten",
   "main": "index.js",
   "browser": "browser.js",
@@ -10,7 +10,7 @@
   "bin": {
     "horten-websocket-server": "bin/horten-websocket-server"
   },
-  "author": "",
+  "author": "Samm Zuest Cooper <samm@sublight.ca>",
   "license": "MIT",
   "dependencies": {
     "bluebird": "^3.4.6",
@@ -27,12 +27,8 @@
     "babelify": "^7.0.2",
     "browserify": "^12.0.1",
     "chai": "^3.5.0",
-    "eslint": "^1.7.3",
-    "eslint-config-airbnb": "^2.0.0",
-    "eslint-plugin-react": "^3.6.3",
     "gulp": "^3.9.0",
     "gulp-clean": "^0.3.2",
-    "gulp-eslint": "^1.0.0",
     "gulp-load-plugins": "^1.0.0",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-uglify": "^1.4.2",

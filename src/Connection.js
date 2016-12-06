@@ -59,6 +59,7 @@ class Connection extends Cursor {
     if ( !connection )
       return Promise.resolve()
 
+    self[ NS.setStatus ]('closing', 2 )
     var promise = self[ NS.closingPromise ] = Promise.fromCallback( function ( cb ) {
       // console.log('client.close?')
 
@@ -73,6 +74,8 @@ class Connection extends Cursor {
       self[ NS.connection ] = null
       self[ NS.closingPromise ] = null
       // console.log('client.close!')
+      self[ NS.setStatus ]('closed', 3 )
+
       self.emit('close')
     })
 
@@ -185,7 +188,6 @@ Connection.prototype[ NS.onDelta ] = function ( delta ) {
     this.send( mesg )
 }
 
-
 Connection.prototype[ NS.setConnection ] = function ( connection ) {
   // // console.log('setConnection', this )
   this[ NS.connection ] = connection
@@ -204,8 +206,11 @@ Connection.prototype[ NS.setConnection ] = function ( connection ) {
   }
 
   this.hold = false
+}
 
-
+Connection.prototype[ NS.setStatus ] = function ( status ) {
+  if ( this.statusPass )
+    this.root.patch( status, this.statusPass )
 }
 
 module.exports = Connection

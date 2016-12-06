@@ -51,8 +51,8 @@ var createBundle = options => {
   // }))
 
   b.transform(babelify, {
-    global: true,
-    ignore: /\/node_modules\/(?!horten\/)/,
+    // global: true,
+    // ignore: /\/node_modules\/(?!horten\/)/,
     presets: ['es2015']
   })
 
@@ -99,5 +99,5 @@ gulp.task('watch', () => {
 
 
 gulp.task('default', () => {
-  runSequence(['clean','watch'])
+  runSequence(['clean','scripts'])
 })

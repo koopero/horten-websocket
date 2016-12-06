@@ -1,13 +1,13 @@
-var test = require('./_test')
+const test = require('./_test')
     , assert = test.assert
 
 require('../src/polyfill')
 
 describe('client', function () {
-  var Client = require('../src/Client')
+  const Client = require('../src/Client')
 
   it('will try to open and fail', function () {
-    var client = new Client()
+    const client = new Client()
 
     var wasThrown = false
     return client.open( 'ws://:70000' )
@@ -20,7 +20,7 @@ describe('client', function () {
   })
 
   it('will be created automatically for tests', function () {
-    var client = test.createClient()
+    const client = test.createClient()
     return client.close()
     .then( function () {
 

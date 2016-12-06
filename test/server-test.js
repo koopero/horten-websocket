@@ -1,4 +1,4 @@
-var test = require('./_test')
+const test = require('./_test')
     , assert = test.assert
 
 describe('server', function () {

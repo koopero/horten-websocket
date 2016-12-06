@@ -1,6 +1,6 @@
 'use strict'
 
-var test = require('./_test')
+const test = require('./_test')
     , assert = test.assert
     , Promise = require('bluebird')
 
@@ -8,7 +8,7 @@ require('../src/polyfill')
 
 describe('server + client', function () {
   it('will be created automatically for tests', function () {
-    var both = test.createClientServer()
+    const both = test.createClientServer()
         , server = both.server
         , client = both.client
 
@@ -18,7 +18,7 @@ describe('server + client', function () {
 
 
   it('will pass a message from client to server', function () {
-    var both = test.createClientServer()
+    const both = test.createClientServer()
         , server = both.server
         , client = both.client
         , mesg = { foo: 'bar' }
@@ -36,7 +36,7 @@ describe('server + client', function () {
   })
 
   it('will pass a message from server to client', function () {
-    var both = test.createClientServer()
+    const both = test.createClientServer()
         , server = both.server
         , client = both.client
         , serverMessage = { foo: 'bar' }
@@ -54,7 +54,7 @@ describe('server + client', function () {
   })
 
   it('client will take state from server', function () {
-    var both = test.createClientServer()
+    const both = test.createClientServer()
         , server = both.server
         , client = both.client
         , data = { foo: 'bar' }
@@ -76,7 +76,7 @@ describe('server + client', function () {
   })
 
   it('client will patch server', function () {
-    var both = test.createClientServer()
+    const both = test.createClientServer()
         , server = both.server
         , client = both.client
         , data = { foo: 'ba222' }
@@ -91,7 +91,7 @@ describe('server + client', function () {
   })
 
   it('server will patch client', function () {
-    var both = test.createClientServer()
+    const both = test.createClientServer()
         , server = both.server
         , client = both.client
         , data = { foo: 'baz' }
@@ -106,7 +106,7 @@ describe('server + client', function () {
   })
 
   it('server will not echo', function () {
-    var both = test.createClientServer()
+    const both = test.createClientServer()
         , server = both.server
         , client = both.client
         , data = { foo: 'baz' }
@@ -122,7 +122,7 @@ describe('server + client', function () {
   })
 
   it('client will not echo', function () {
-    var both = test.createClientServer()
+    const both = test.createClientServer()
         , server = both.server
         , client = both.client
         , data = { foo: 'baz' }

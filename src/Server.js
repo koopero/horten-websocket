@@ -1,17 +1,14 @@
 'use strict'
 
-var NS = require('./namespace')
+const NS = require('./namespace')
 
-var _server = Symbol('_server')
-    , _closingPromise = Symbol('_closingPromise')
+const DEFAULT_PORT = 4000
 
-var DEFAULT_PORT = 4000
-
-var H = require('horten')
+const H = require('horten')
     , Promise = require('bluebird')
     , Cursor = H.Cursor
 
-var Connection = require('./Connection')
+const Connection = require('./Connection')
     , Logger = require('./Logger')
 
 class Server extends Cursor {
@@ -29,10 +26,10 @@ class Server extends Cursor {
 
     return self.close()
     .then( () => Promise.fromCallback( function ( cb ) {
-      if ( self[ _server ] )
-        self[ _server ].close()
+      if ( self[ NS.server ] )
+        self[ NS.server ].close()
 
-      self[ _server ] = middleWare.listen( port, cb )
+      self[ NS.server ] = middleWare.listen( port, cb )
     }))
     .then( () => self.emit('listen', { port: port } ) )
   }
@@ -40,21 +37,21 @@ class Server extends Cursor {
   close( ) {
     var self = this
 
-    if ( self[ _closingPromise ] )
-      return self[ _closingPromise ]
+    if ( self[ NS.closingPromise ] )
+      return self[ NS.closingPromise ]
 
-    var server = self[ _server ]
+    var server = self[ NS.server ]
 
     if ( !server )
       return Promise.resolve()
 
-    return self[ _closingPromise ] = Promise.fromCallback( function ( cb ) {
+    return self[ NS.closingPromise ] = Promise.fromCallback( function ( cb ) {
       server.close()
       setImmediate( cb )
     })
     .then( () => {
-      self[ _server ] = null
-      self[ _closingPromise ] = null
+      self[ NS.server ] = null
+      self[ NS.closingPromise ] = null
       self.emit('close')
     })
   }

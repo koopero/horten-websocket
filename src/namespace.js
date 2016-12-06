@@ -1,35 +1,36 @@
 'use strict'
 
-var NS = exports
-
+const NS = exports
 NS.DEFAULT_PORT = 4000
+const keys = [
+  'verbose',
+  'connection',
+  'connections',
+  'target',
+  'listeners',
+  'closingPromise',
+  'server',
+  'setConnection',
+  'setStatus',
+  'createConnection',
+  'onClientMessage',
+  'onClientEvent',
+  'onDelta',
+  'closeConnection',
+  '_openingPromise',
+  'onConnectionOpen',
+  'onConnectionMessage',
+  'onConnectionClose',
+  'onClientMessage',
+  'onClientError',
+  'onWebSocketMessage',
+  'onMessage',
+  'onError',
+  'onClose',
+  'middleWare',
+  'tick',
+]
 
-NS.verbose = Symbol()
-NS.connection = Symbol()
-NS.connections = Symbol()
-NS.target = Symbol()
-NS.listeners = Symbol()
-
-NS.closingPromise = Symbol()
-NS.setConnection = Symbol()
-NS.createConnection = Symbol()
-NS.onClientMessage = Symbol()
-NS.onClientEvent = Symbol()
-
-NS.onDelta = Symbol()
-NS.closeConnection = Symbol()
-
-NS._openingPromise = Symbol()
-NS.onConnectionOpen = Symbol()
-NS.onConnectionMessage = Symbol()
-NS.onConnectionClose = Symbol()
-NS.onClientMessage = Symbol()
-NS.onClientError = Symbol()
-
-NS.onWebSocketMessage = Symbol()
-NS.onMessage = Symbol()
-NS.onError = Symbol()
-NS.onClose = Symbol()
-NS.middleWare = Symbol()
-
-NS.tick = Symbol()
+keys.forEach( ( key ) =>
+  NS[key] = Symbol( key )
+)

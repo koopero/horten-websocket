@@ -1,12 +1,12 @@
 'use strict'
 
-var pathlib = require('path')
+const pathlib = require('path')
     , resolveModule = pathlib.resolve.bind( pathlib, __dirname, '..' )
 
-var NS = require('./namespace')
+const NS = require('./namespace')
 
 module.exports = function middleWare ( server ) {
-  var express = require('express')
+  const express = require('express')
       , app = express()
       , ws = require('express-ws')( app )
 
@@ -17,7 +17,6 @@ module.exports = function middleWare ( server ) {
 
   app.use('/horten-websocket/', express.static( resolveModule('build/' ) ) )
   app.use('/horten-websocket/', express.static( resolveModule('static/' ) ) )
-
 
   return app
 }

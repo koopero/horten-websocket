@@ -1,7 +1,7 @@
 'use strict'
 
-var HortenWebsocketClient = require('./HortenWebsocketClient')
-var client = new HortenWebsocketClient()
+const HortenWebsocketClient = require('./HortenWebsocketClient')
+const client = new HortenWebsocketClient()
 client.open()
 .then( function () {
   client.pull()

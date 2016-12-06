@@ -1,44 +1,31 @@
 'use strict'
 
-var NS = require('./namespace')
+const NS = require('./namespace')
     , Connection = require('./Connection')
 
-var H = require('horten')
+const H = require('horten')
     , Promise = require('bluebird')
 
 class Client extends Connection {
+  constructor( opt ) {
+    super( opt )
+    this.statusPass = '/horten/websocket'
+  }
 
   open ( url ) {
-    if ( 'number' == typeof url  ) {
-      url = Math.max( 0, parseInt( url ) ) || NS.DEFAULT_PORT
-      url = 'ws://localhost:'+url+'/horten-websocket'
-    }
 
-    if ( !url ) {
-      var window = global.window
-
-      if ( window ) {
-        var loc = window.location
-
-        if (loc.protocol === "https:") {
-            url = "wss:";
-        } else {
-            url = "ws:";
-        }
-
-        url += "//" + loc.host;
-        url += '/horten-websocket';
-      }
-    }
-
-    var self = this
+    const self = this
         , opt = {}
+
+    url = self.getURL( url )
+
+
 
     self._id = '_client'
 
+    self[ NS.setStatus ]( 'opening', 0 )
+
     var promise = self[ NS.openingPromise ]
-
-
     promise = new Promise( function ( resolve, reject ) {
       var connection = new WebSocket( url )
 
@@ -78,33 +65,39 @@ class Client extends Connection {
 
     return promise
   }
+
+  getURL( url ) {
+    if ( 'number' == typeof url  ) {
+      url = Math.max( 0, parseInt( url ) ) || NS.DEFAULT_PORT
+      url = 'ws://localhost:'+url+'/horten-websocket'
+    }
+
+    if ( !url ) {
+      const window = global.window
+
+      if ( window ) {
+        const loc = window.location
+
+        if (loc.protocol === "https:") {
+            url = "wss:";
+        } else {
+            url = "ws:";
+        }
+
+        url += "//" + loc.host;
+        url += '/horten-websocket';
+      }
+    }
+
+    return url
+  }
+
 }
 
 
 Client.prototype[ NS.onWebSocketMessage ] = function ( message ) {
   this[ NS.onMessage ]( message.data )
 }
-
-// Client.prototype[ NS.onConnectionOpen ] = function onConnectionOpen() {
-//   this.emit('open')
-//
-//   this[ NS.connection ].on('message', this[ NS.onConnectionMessage ].bind( this ) )
-//   this[ NS.connection ].on('close', this[ NS.onConnectionClose ].bind( this )  )
-// }
-//
-// Client.prototype[ NS.onConnectionMessage ] = function onConnectionMessage( msg ) {
-//
-//   this.emit('message', msg )
-// }
-//
-// Client.prototype[ NS.onConnectionClose ] = function onConnectionClose( err ) {
-//
-//   if ( this[ NS.connection ] ) {
-//     this[ NS.connection ].removeAllListeners()
-//     this.emit('close')
-//   }
-//
-// }
 
 
 module.exports = Client
