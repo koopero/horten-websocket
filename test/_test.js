@@ -4,25 +4,25 @@ test.assert = require('chai').assert
 var ID = 0
 var nextId = () => ID++
 
-var NS = require('../src/namespace')
+const NS = require('../src/namespace')
     , Server = require('../src/Server')
     , Logger = require('../src/Logger')
     , Client = require('../src/Client')
 
 
-var H = require('horten')
+const H = require('horten')
     , Mutant = H.Mutant
 
-var Promise = require('bluebird')
+const Promise = require('bluebird')
 
-var PORT = 4000
+const PORT = 4000
 
 test.port = ( override ) => Math.max( 0, parseInt( override ) ) || PORT
 
 test.createClientServer = function () {
-  var port = PORT
+  const port = PORT
 
-  var client = test.createClient( port )
+  const client = test.createClient( port )
       , server = test.createServer( port )
 
   return {
@@ -35,10 +35,11 @@ test.createClientServer = function () {
 
 test.createClient = function ( port ) {
   port = test.port( port )
-  var url = 'ws://localhost:'+port
-  var opt = { pull: false }
-  var client = new Client()
-  var logger = new Logger()
+  const url = 'ws://localhost:'+port
+  const opt = { pull: false }
+  const root = new Mutant()
+  const client = new Client({ root: root })
+  const logger = new Logger()
   logger.target = client
   client.name = 'client:'+nextId()
 
@@ -50,8 +51,9 @@ test.createClient = function ( port ) {
 
 test.createServer = function ( port ) {
   port = test.port( port )
-  var server = new Server()
-  var logger = new Logger()
+  const root = new Mutant()
+  const server = new Server({ root: root })
+  const logger = new Logger()
   logger.target = server
   server.name = 'server:'+nextId()
   server.mutant = new Mutant()
@@ -80,15 +82,31 @@ test.ping = function( port ) {
 }
 
 
-var DATA_KEYS = ['sparky','skookum','saddlebag','sarcasm','such']
+const DATA_KEYS = ['sparky','skookum','saddlebag','sarcasm','such']
 
 test.data = function() {
-  var result = {}
+  const result = {}
   for ( var i = 0; i < 3; i ++ ) {
     var ind = Math.floor( DATA_KEYS.length * Math.random() )
       , key = DATA_KEYS[ind]
 
     result[key] = Math.round( Math.random() * 12 ) * Math.pow( 2, Math.round( Math.random() * 4 - 2 ) )
+  }
+
+  return result
+}
+
+var PATH_KEYS = ['elvin','ankle','uncle','ulcer','equilibrium']
+
+test.path = function() {
+  var result = []
+    , length = Math.round( Math.random() * 2 ) + 1
+
+  for ( var i = 0; i < length; i ++ ) {
+    var ind = Math.floor( PATH_KEYS.length * Math.random() )
+      , key = PATH_KEYS[ind]
+
+    result.push( key )
   }
 
   return result

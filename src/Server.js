@@ -12,8 +12,8 @@ const Connection = require('./Connection')
     , Logger = require('./Logger')
 
 class Server extends Cursor {
-  constructor () {
-    super()
+  constructor ( opt ) {
+    super( opt )
     this[ NS.connections ] = []
   }
 

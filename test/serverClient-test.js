@@ -3,6 +3,7 @@
 const test = require('./_test')
     , assert = test.assert
     , Promise = require('bluebird')
+    , H = require('horten')
 
 require('../src/polyfill')
 
@@ -57,17 +58,17 @@ describe('server + client', function () {
     const both = test.createClientServer()
         , server = both.server
         , client = both.client
+        , path = test.path()
         , data = { foo: 'bar' }
 
-    server.patch( data )
+    server.patch( data, path )
 
-    assert.deepEqual( server.get(), data )
-
+    assert.deepEqual( server.get(), H.wrap( data, path ) )
 
     return both.open()
     .then( () => client.pull() )
-    .then( ( result ) =>  assert.deepEqual( result, data ) )
-    .then( () => assert.deepEqual( client.get(), data ) )
+    .then( ( result ) => assert.deepEqual( result, H.wrap( data, path ) ) )
+    .then( () => assert.deepEqual( client.root.get( path ), data ) )
     .then( both.close )
     .catch( ( e ) => {
       both.close()
@@ -99,8 +100,8 @@ describe('server + client', function () {
     return both.open()
     .then( () => server.mutant.patch( data ) )
     .then( () => test.waitFor( 'value', client ) )
-    .then( ( result ) => assert.deepEqual( result, data ) )
-    .then( () => assert.deepEqual( client.get(), data ) )
+    .then( ( result ) => assert.deepEqual( H.unset( result, '_local' ), data ) )
+    .then( () => assert.deepEqual( H.unset( client.get(), '_local' ), data ) )
     // .delay( 1000 )
     .then( both.close )
   })
@@ -135,6 +136,41 @@ describe('server + client', function () {
       both.close()
       throw e
     } )
+  })
+
+  it('server will trace', function () {
+    const both = test.createClientServer()
+        , server = both.server
+        , client = both.client
+        , data = test.data()
+
+    new H.Tracer( {
+      root: server.root,
+      listening: true
+    })
+
+    return both.open()
+    .then( () => client.mutant.patch( data ) )
+    .delay( 500 )
+    .then( both.close )
+  })
+
+  it('client will trace status', function () {
+    const both = test.createClientServer()
+        , server = both.server
+        , client = both.client
+        , data = test.data()
+
+    new H.Tracer( {
+      root: client.root,
+      path: '_local/websocket',
+      listening: true
+    })
+
+    return both.open()
+    .then( () => client.mutant.patch( data ) )
+    .delay( 500 )
+    .then( both.close )
   })
 
 })

@@ -60,7 +60,7 @@ class Connection extends Cursor {
     if ( !connection )
       return Promise.resolve()
 
-    self[ NS.setStatus ]('closing', 2 )
+    self[ NS.setStatus ]( { readyState: 2, status: 'closing', open: false } )
     var promise = self[ NS.closingPromise ] = withCallback( ( cb ) => {
       connection.close()
       setImmediate( cb )
@@ -73,8 +73,7 @@ class Connection extends Cursor {
       self[ NS.connection ] = null
       self[ NS.closingPromise ] = null
       // console.log('client.close!')
-      self[ NS.setStatus ]('closed', 3 )
-
+      self[ NS.setStatus ]( { readyState: 3, status: 'closed', open: false } )
       self.emit('close')
     })
 
@@ -121,7 +120,6 @@ Connection.prototype[ NS.tick ] = function () {
     }
   } else {
     // not open
-    console.error('CONNECTION NOT OPEN', this)
     self.hold = true
   }
 
@@ -167,16 +165,19 @@ Connection.prototype[ NS.onMessage ] = function ( msg ) {
   }
 }
 
-Connection.prototype[ NS.onError ] = function ( mesg ) {
-  console.error( 'Connection.prototype.onError', mesg )
+Connection.prototype[ NS.onError ] = function ( err ) {
+  this[ NS.setStatus ]( { readyState: 2, status: 'error', error: err } )
+  // this.emit('error', err )
 }
 
-Connection.prototype[ NS.onClose ] = function ( mesg ) {
-  // console.error( 'Connection.prototype.onClose', mesg )
+Connection.prototype[ NS.onClose ] = function ( reason ) {
+  this[ NS.setStatus ]( { readyState: 3, status: 'closed', open: false } )
+  this.emit('close' )
 }
 
 Connection.prototype[ NS.onDelta ] = function ( delta ) {
   // console.log('Connection.onDelta', delta )
+  delta = H.unset( delta, '_local' )
   const mesg = Message.delta( delta, [] )
   if ( this.isOpen() )
     this.send( mesg )

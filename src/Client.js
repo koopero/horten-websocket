@@ -8,7 +8,7 @@ const H = require('horten')
 class Client extends Connection {
   constructor( opt ) {
     super( opt )
-    this.statusPass = '/horten/websocket'
+    this.statusPass = '/_local/websocket'
   }
 
   open ( url ) {
@@ -18,11 +18,9 @@ class Client extends Connection {
 
     url = self.getURL( url )
 
+    self._id = '_horten'
 
-
-    self._id = '_client'
-
-    self[ NS.setStatus ]( 'opening', 0 )
+    self[ NS.setStatus ]( { readyState: 0, status: 'opening', url: url, open: false } )
 
     var promise = self[ NS.openingPromise ]
     promise = new Promise( function ( resolve, reject ) {
@@ -56,6 +54,7 @@ class Client extends Connection {
 
     promise = promise.then( function () {
       self[ NS.openingPromise] = null
+      self[ NS.setStatus ]( { readyState: 1, status: 'open', error: null, open: true } )
       self.emit('open')
       self.listening = true
     })
