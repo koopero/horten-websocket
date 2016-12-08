@@ -1,6 +1,6 @@
 {
   "name": "horten-websocket",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "WebSocket adapter for Horten",
   "main": "index.js",
   "browser": "browser.js",
