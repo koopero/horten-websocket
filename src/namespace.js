@@ -17,7 +17,7 @@ const keys = [
   'onClientEvent',
   'onDelta',
   'closeConnection',
-  '_openingPromise',
+  'openingPromise',
   'onConnectionOpen',
   'onConnectionMessage',
   'onConnectionClose',
@@ -28,6 +28,7 @@ const keys = [
   'onError',
   'onClose',
   'middleWare',
+  'retry',
   'tick',
 ]
 

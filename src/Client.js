@@ -8,55 +8,64 @@ const H = require('horten')
 class Client extends Connection {
   constructor( opt ) {
     super( opt )
+    this.pullOnOpen = true
     this.statusPass = '/_local/websocket'
+    // if ( opt && opt.retry !== false )
+    //   this.retry = true
   }
 
   open ( url ) {
-
     const self = this
         , opt = {}
 
-    url = self.getURL( url )
+    if ( self[ NS.openingPromise ] )
+      return self[ NS.openingPromise ]
 
+    url = self.getURL( url || self.url )
+
+    self.url = url
     self._id = '_horten'
 
     self[ NS.setStatus ]( { readyState: 0, status: 'opening', url: url, open: false } )
 
-    var promise = self[ NS.openingPromise ]
-    promise = new Promise( function ( resolve, reject ) {
-      var connection = new WebSocket( url )
+    var promise = new Promise( function ( resolve, reject ) {
+      self.once( 'open', () => resolve( self ) )
+      self.once( 'error', ( err ) => reject( err ) )
 
-      if ( 'function' == typeof connection.once ) {
-        // Is ws
-        connection.once('open', onOpen )
-        connection.once('error', onError )
-      } else {
-        // Is real, native WebSocket
-        connection.onopen = onOpen
-        connection.onerror = onError
-      }
-
-      function onOpen() {
+      try {
+        const connection = new WebSocket( url )
         self[ NS.setConnection ]( connection )
-        resolve( self )
+      } catch( err ) {
+        onError( err )
       }
 
       function onError( err ) {
-        connection.removeAllListeners()
-        reject( err )
+        if ( !self[ NS.retry ]() ) {
+          reject( err )
+        }
+      }
+    })
+    .catch( ( err ) => {
+      self[ NS.openingPromise] = null
+
+      if ( !self[ NS.retry ]() ) {
+        throw err
       }
     })
 
-    if ( opt.pull )
+    if ( opt.pullOnOpen )
       promise = promise.then( function () {
-        pull()
+        return new Promise( function ( resolve ) {
+          self.on('pull', ( data ) => resolve( data ) )
+        })
       } )
 
-    promise = promise.then( function () {
+    promise = promise.then( function ( data ) {
       self[ NS.openingPromise] = null
       self[ NS.setStatus ]( { readyState: 1, status: 'open', error: null, open: true } )
       self.emit('open')
       self.listening = true
+      return data || self 
     })
 
     self[ NS.openingPromise ] = promise

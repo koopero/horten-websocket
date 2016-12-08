@@ -11,8 +11,8 @@ const H = require('horten')
     , withCallback = require('with-callback')
 
 class Connection extends Cursor {
-  constructor() {
-    super()
+  constructor( opt ) {
+    super( opt )
 
     this.configure({
       delay: 1,
@@ -21,6 +21,15 @@ class Connection extends Cursor {
 
     this[ NS.tick ] = this[ NS.tick ].bind( this )
 
+  }
+
+  configure( opt ) {
+    super.configure( opt )
+    if ( opt.retry )
+      this.retry = true
+
+    if ( opt.pullOnOpen )
+      this.pullOnOpen = true
   }
 
   send( msg ) {
@@ -73,8 +82,10 @@ class Connection extends Cursor {
       self[ NS.connection ] = null
       self[ NS.closingPromise ] = null
       // console.log('client.close!')
-      self[ NS.setStatus ]( { readyState: 3, status: 'closed', open: false } )
-      self.emit('close')
+      if ( !self[ NS.retry]() ) {
+        self[ NS.setStatus ]( { readyState: 3, status: 'closed', open: false } )
+        self.emit('close')
+      }
     })
 
     return promise
@@ -165,14 +176,44 @@ Connection.prototype[ NS.onMessage ] = function ( msg ) {
   }
 }
 
+Connection.prototype[ NS.onOpen ] = function ( err ) {
+  const self = this
+  if ( this.pullOnOpen ) {
+    this.pull()
+    .then( ( data ) => self.emit('pull', data ) )
+  }
+
+  this[ NS.setStatus ]( { readyState: 1, status: 'open', error: null } )
+  this.emit( 'open' )
+}
+
 Connection.prototype[ NS.onError ] = function ( err ) {
-  this[ NS.setStatus ]( { readyState: 2, status: 'error', error: err } )
-  // this.emit('error', err )
+  if ( !this[ NS.retry ]() ) {
+    this[ NS.setStatus ]( { readyState: 2, status: 'error', error: err } )
+  }
 }
 
 Connection.prototype[ NS.onClose ] = function ( reason ) {
-  this[ NS.setStatus ]( { readyState: 3, status: 'closed', open: false } )
-  this.emit('close' )
+  if ( !this[ NS.retry ]() ) {
+    this[ NS.setStatus ]( { readyState: 3, status: 'closed', open: false } )
+    this.emit('close' )
+  }
+}
+
+Connection.prototype[ NS.retry ] = function() {
+  if ( !this.retry )
+    return false
+
+  this[ NS.openingPromise ] = null
+  this[ NS.closingPromise ] = null
+
+  this[ NS.setStatus ]( { readyState: 0, status: 'retry', open: false } )
+  const open = this.open.bind( this )
+      , retryTime = parseFloat( this.retryTime ) || 2000
+
+  setTimeout( open, retryTime )
+
+  return true
 }
 
 Connection.prototype[ NS.onDelta ] = function ( delta ) {
@@ -190,11 +231,13 @@ Connection.prototype[ NS.setConnection ] = function ( connection ) {
 
   if ( 'function' == typeof connection.on ) {
     // Is ws
+    connection.on('open',    this[ NS.onOpen ]   .bind( this ) )
     connection.on('message', this[ NS.onMessage ].bind( this ) )
     connection.on('error',   this[ NS.onError ]  .bind( this ) )
     connection.on('close',   this[ NS.onClose ]  .bind( this ) )
   } else {
     // Is real, native WebSocket
+    connection.onopen    = this[ NS.onOpen ]   .bind( this )
     connection.onmessage = this[ NS.onWebSocketMessage ].bind( this )
     connection.onerror   = this[ NS.onError ]  .bind( this )
     connection.onclose   = this[ NS.onClose ]  .bind( this )
