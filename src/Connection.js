@@ -76,7 +76,7 @@ class Connection extends Cursor {
     })
     .catch( function ( closeError ) {
       // Probably don't care...
-      console.error('Connection.close', closeError )
+      // console.error('Connection.close', closeError )
     })
     .then( () => {
       self[ NS.connection ] = null
@@ -159,7 +159,7 @@ Connection.prototype[ NS.onMessage ] = function ( msg ) {
         var path = H.path.split( msg.path )
           , data = self.get( path )
           , wrapped = H.wrap( data, path )
-          , response = Message.delta( wrapped )
+          , response = Message.delta( wrapped, [] )
 
         self.send( response )
       break
@@ -217,11 +217,11 @@ Connection.prototype[ NS.retry ] = function() {
 }
 
 Connection.prototype[ NS.onDelta ] = function ( delta ) {
-  // console.log('Connection.onDelta', delta )
   delta = H.unset( delta, '_local' )
   const mesg = Message.delta( delta, [] )
-  if ( this.isOpen() )
+  if ( this.isOpen() ) {
     this.send( mesg )
+  }
 }
 
 Connection.prototype[ NS.setConnection ] = function ( connection ) {

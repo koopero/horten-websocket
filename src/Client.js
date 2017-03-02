@@ -10,6 +10,11 @@ class Client extends Connection {
     super( opt )
     this.pullOnOpen = true
     this.statusPass = '/_local/websocket'
+
+    // TODO: TEMP HACK FUX
+    // this.echo = false
+
+    // console.log('new Client', this )
     // if ( opt && opt.retry !== false )
     //   this.retry = true
   }
@@ -65,7 +70,7 @@ class Client extends Connection {
       self[ NS.setStatus ]( { readyState: 1, status: 'open', error: null, open: true } )
       self.emit('open')
       self.listening = true
-      return data || self 
+      return data || self
     })
 
     self[ NS.openingPromise ] = promise
