@@ -1,6 +1,6 @@
 {
   "name": "horten-websocket",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "WebSocket adapter for Horten",
   "main": "index.js",
   "browser": "browser.js",
@@ -42,5 +42,21 @@
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.5.0"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/koopero/horten-websocket.git"
+  },
+  "keywords": [
+    "Horten",
+    "websocket",
+    "realtime"
+  ],
+  "bugs": {
+    "url": "https://github.com/koopero/horten-websocket/issues"
+  },
+  "homepage": "https://github.com/koopero/horten-websocket#readme"
 }

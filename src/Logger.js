@@ -3,9 +3,7 @@
 const EVENTS = [
   'listen',
   'open',
-  'close',
-  'message',
-  'send'
+  'close'
 ]
 
 const NS = require('./namespace')
@@ -13,6 +11,15 @@ const NS = require('./namespace')
 const treebird = require('treebird')
 
 class Logger {
+
+  constructor( events ) {
+    if ( Array.isArray( events ) )
+      this.events = events
+    else if ( false === events )
+      this.events = []
+    else
+      this.events = EVENTS
+  }
 
   event( eventName ) {
     const data = arguments.length == 2 ?
@@ -22,6 +29,7 @@ class Logger {
             : {}
         , target = this[NS.target] || {}
         , name = this.name || target.name
+
     treebird( data, eventName, name )
   }
 

@@ -84,11 +84,11 @@ Server.prototype[ NS.createConnection ] = function ( ws, req ) {
   connection.mutant = this.mutant
   connection.listening = true
   connection.ip = ip
+
   if ( this[ NS.verbose ] ) {
     var logger = new Logger()
     logger.target = connection
   }
-
 
   connection.on('message', this[ NS.onClientEvent ].bind( this,  'message' ) )
   connection.on('deltaRemote', this[ NS.onClientEvent ].bind( this, 'deltaRemote' ) )
