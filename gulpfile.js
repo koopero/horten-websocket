@@ -46,15 +46,9 @@ var createBundle = options => {
   })
 
   let b = browserify(opts)
-  // b.transform(babelify.configure({
-  //   // plugins: ["transform-es2015-classes"],
-  //   presets: ['es2015'],
-  //   compact: false
-  // }))
 
   b.transform(babelify, {
     global: true,
-    ignore: /\/node_modules\/(?!horten\/)/,
     presets: ['es2015']
   })
 

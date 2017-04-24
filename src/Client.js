@@ -8,15 +8,8 @@ const H = require('horten')
 class Client extends Connection {
   constructor( opt ) {
     super( opt )
-    this.pullOnOpen = true
+    this.pullOnOpen = opt && opt.pullOnOpen === false ? false : true
     this.statusPass = '/_local/websocket'
-
-    // TODO: TEMP HACK FUX
-    // this.echo = false
-
-    // console.log('new Client', this )
-    // if ( opt && opt.retry !== false )
-    //   this.retry = true
   }
 
   open ( url ) {
