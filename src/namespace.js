@@ -32,6 +32,7 @@ const keys = [
   'tick',
 ]
 
+const Symbol = require('es6-symbol')
 keys.forEach( ( key ) =>
   NS[key] = Symbol( key )
 )

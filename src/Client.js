@@ -2,8 +2,8 @@
 
 const NS = require('./namespace')
     , Connection = require('./Connection')
-
-const H = require('horten')
+    , Promise = require('promise-polyfill')
+    , H = require('horten')
 
 class Client extends Connection {
   constructor( opt ) {

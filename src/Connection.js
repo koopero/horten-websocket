@@ -4,11 +4,10 @@ require('setimmediate')
 
 const NS = require('./namespace')
     , Message = require('./Message')
-
-
-const H = require('horten')
+    , H = require('horten')
     , Cursor = H.Cursor
     , withCallback = require('with-callback')
+    , Promise = require('promise-polyfill')
 
 class Connection extends Cursor {
   constructor( opt ) {

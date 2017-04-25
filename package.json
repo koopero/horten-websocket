@@ -1,6 +1,6 @@
 {
   "name": "horten-websocket",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "WebSocket adapter for Horten",
   "main": "index.js",
   "browser": "browser.js",
@@ -14,9 +14,11 @@
   "license": "MIT",
   "dependencies": {
     "bluebird": "^3.4.6",
+    "es6-symbol": "^3.1.1",
     "express": "^4.14.0",
     "express-ws": "^2.0.0",
-    "horten": "^0.8.2",
+    "horten": "^0.8.3",
+    "promise-polyfill": "^6.0.2",
     "treebird": "^0.2.2",
     "with-callback": "^1.0.2",
     "ws": "^1.1.1"
