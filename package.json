@@ -19,7 +19,7 @@
     "express-ws": "^2.0.0",
     "horten": "^0.8.3",
     "promise-polyfill": "^6.0.2",
-    "treebird": "^0.2.2",
+    "treebird": "^0.2.3",
     "with-callback": "^1.0.2",
     "ws": "^1.1.1"
   },
