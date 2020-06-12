@@ -1,7 +1,5 @@
 'use strict'
 
-require('setimmediate')
-
 const NS = require('./namespace')
     , Message = require('./Message')
     , H = require('horten')
